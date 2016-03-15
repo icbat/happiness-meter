@@ -9,5 +9,4 @@ def save_new():
     print("Got something")
     return {'message': 'got it'}
 
-debug(True)
 run()
