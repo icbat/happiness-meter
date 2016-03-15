@@ -1,8 +1,13 @@
-from bottle import run, route, debug, template
+from bottle import run, route, debug, template, get, post
 
-@route('/data', method = 'GET')
+@get('/data')
 def list():
-    return template('templates/list.tpl')
+    return {'message': 'not-yet-implemented'}
+
+@post('/data')
+def save_new():
+    print("Got something")
+    return {'message': 'got it'}
 
 debug(True)
-run(reloader=True)
+run()
