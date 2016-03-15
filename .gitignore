@@ -4,3 +4,6 @@
 Include/
 Lib/
 Scripts
+
+# Pip's caching mechanism
+pip-selfcheck.json
