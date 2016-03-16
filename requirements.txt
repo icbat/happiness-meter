@@ -1,0 +1,2 @@
+bottle==0.12.9
+virtualenv==15.0.0
