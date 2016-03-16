@@ -1,14 +1,18 @@
 from bottle import run, route, debug, template, get, post
 import argparse
 
-@get('/data')
+@get('/happiness-data')
 def list():
     return {'message': 'not-yet-implemented'}
 
-@post('/data')
+@post('/happiness-data')
 def save_new():
     print("Got something")
     return {'message': 'got it'}
+
+@post('/users/link')
+def link_users():
+    return {'message': 'yup, linkin'}
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--port', type=int, default="5000")
