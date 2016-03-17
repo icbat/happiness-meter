@@ -1,12 +1,13 @@
-from bottle import run, route, debug, template, get, post, request
+from bottle import Bottle
 import argparse
 
+app = Bottle()
 
-@get('/happiness-data')
+@app.get('/happiness-data')
 def list():
     return {'message': 'not-yet-implemented'}
 
-@post('/happiness-data')
+@app.post('/happiness-data')
 def save_new():
     print ("### Start transmission ###")
     print_value ("request", request)
@@ -21,11 +22,11 @@ def save_new():
 
     return {'message': 'got it'}
 
-@get('/users')
+@app.get('/users')
 def list():
     return {'message': 'not-yet-implemented'}
 
-@post('/users/link')
+@app.post('/users/link')
 def link_users():
     return {'message': 'not-yet-implemented, use /happiness-data for testing'}
 
@@ -47,4 +48,4 @@ parser.add_argument('--port', type=int, default="5000")
 parser.add_argument('--host', default="127.0.0.1")
 args = parser.parse_args()
 
-run(port=args.port, host=args.host)
+app.run(port=args.port, host=args.host)
