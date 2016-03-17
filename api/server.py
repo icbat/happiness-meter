@@ -18,7 +18,7 @@ def list(mongodb):
     return dumps(mongodb['happiness'].find())
 
 @app.post('/happiness-data')
-def save_new():
+def save_new(mongodb):
     data_point = request.json
     if data_point is None:
         print ("No JSON posted")
@@ -26,6 +26,8 @@ def save_new():
 
     print ("JSON received:")
     print (dumps(data_point))
+    print ("Saving to mongodb")
+    mongodb['happiness'].insert(data_point)
     return dumps(data_point)
 
 @app.get('/users')
