@@ -1,11 +1,8 @@
 from bottle import run, route, debug, template, get, post, request
 import argparse
 
-@get('/happiness-data')
-def list():
-    return {'message': 'not-yet-implemented'}
 
-@get('/users')
+@get('/happiness-data')
 def list():
     return {'message': 'not-yet-implemented'}
 
@@ -24,6 +21,14 @@ def save_new():
 
     return {'message': 'got it'}
 
+@get('/users')
+def list():
+    return {'message': 'not-yet-implemented'}
+
+@post('/users/link')
+def link_users():
+    return {'message': 'not-yet-implemented, use /happiness-data for testing'}
+
 def print_value(name, value):
     print ("## " + str(name))
     print (value)
@@ -36,10 +41,6 @@ def print_map(name, map):
         print("  -   " + str(key) + " : " + str(map[key]))
     print ("\n")
 
-
-@post('/users/link')
-def link_users():
-    return {'message': 'not-yet-implemented, use /happiness-data for testing'}
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--port', type=int, default="5000")
