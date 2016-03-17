@@ -1,6 +1,7 @@
 from bottle import Bottle
 import argparse
 
+print ("Initializing")
 app = Bottle()
 
 @app.get('/happiness-data')
@@ -48,4 +49,6 @@ parser.add_argument('--port', type=int, default="5000")
 parser.add_argument('--host', default="127.0.0.1")
 args = parser.parse_args()
 
+print ("Starting the server")
 app.run(port=args.port, host=args.host)
+print ("Shutting down")
