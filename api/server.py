@@ -1,5 +1,7 @@
 from bottle import Bottle
 import argparse
+from bottle.ext.mongo import MongoPlugin
+from bson.json_util import dumps
 from os import environ
 
 print ("Initializing")
@@ -7,10 +9,14 @@ app = Bottle()
 print ("Reading db user data from environment")
 db_username = environ["db_username"]
 db_password = environ["db_password"]
+print ("Connecting to mongo")
+plugin = MongoPlugin(uri="mongodb://"+ db_username +":" + db_password + "@ds015869.mlab.com:15869/heroku_c6rtcbr3", db="mydb", json_mongo=True)
+app.install(plugin)
 
 @app.get('/happiness-data')
-def list():
-    return {'message': 'not-yet-implemented'}
+def list(mongodb):
+    print ("Fetching all happiness data from DB")
+    return dumps(mongodb['happiness'].find())
 
 @app.post('/happiness-data')
 def save_new():
