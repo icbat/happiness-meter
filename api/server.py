@@ -20,10 +20,13 @@ def list(mongodb):
 
 @app.post('/happiness-data')
 def save_new(mongodb):
-    data_point = request.json
+    try:
+        data_point = request.json
+    except:
+        return {"message": "malformed JSON was provided"}
     if data_point is None:
         print ("No JSON posted")
-        return {"message": "this endpoint expects JSON, try again!"}
+        return {"message": "this endpoint expects JSON"}
 
     print ("Adding timestamp to data")
     data_point['timestamp'] = time.time()
