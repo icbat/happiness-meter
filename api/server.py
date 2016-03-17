@@ -1,49 +1,52 @@
-from bottle import run, route, debug, template, get, post, request
+from bottle import Bottle, request
 import argparse
+from bottle.ext.mongo import MongoPlugin
+from bson.json_util import dumps
+from os import environ
+import time
 
-@get('/happiness-data')
+print ("Initializing")
+app = Bottle()
+print ("Reading db configuration from 'mongo_uri' environment variable")
+mongo_uri = environ["mongo_uri"]
+print ("Connecting to mongo")
+plugin = MongoPlugin(uri=mongo_uri, db="mydb", json_mongo=True)
+app.install(plugin)
+
+@app.get('/happiness-data')
+def list(mongodb):
+    print ("Fetching all happiness data from DB")
+    return dumps(mongodb['happiness'].find())
+
+@app.post('/happiness-data')
+def save_new(mongodb):
+    data_point = request.json
+    if data_point is None:
+        print ("No JSON posted")
+        return {"message": "this endpoint expects JSON, try again!"}
+
+    print ("Adding timestamp to data")
+    data_point['timestamp'] = time.time()
+    print ("JSON received:")
+    print (dumps(data_point))
+    print ("Saving to mongodb")
+    mongodb['happiness'].insert(data_point)
+    return dumps(data_point)
+
+@app.get('/users')
 def list():
     return {'message': 'not-yet-implemented'}
 
-@get('/users')
-def list():
-    return {'message': 'not-yet-implemented'}
-
-@post('/happiness-data')
-def save_new():
-    print ("### Start transmission ###")
-    print_value ("request", request)
-    print_value ("request.json", request.json)
-    print_map ("request.POST", request.POST)
-    print_map ("request.POST.files", request.POST.files)
-    print_map ("request.POST.forms", request.POST.forms)
-    print_map ("request.forms", request.forms)
-    print_value ("key's value", request.json['key'])
-    print ("### End transmission ###")
-    print("\n\n")
-
-    return {'message': 'got it'}
-
-def print_value(name, value):
-    print ("## " + str(name))
-    print (value)
-    print ("\n")
-
-def print_map(name, map):
-    print ("## " + str(name))
-    print ("Found a dictionary")
-    for key in map:
-        print("  -   " + str(key) + " : " + str(map[key]))
-    print ("\n")
-
-
-@post('/users/link')
+@app.post('/users/link')
 def link_users():
     return {'message': 'not-yet-implemented, use /happiness-data for testing'}
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--port', type=int, default="5000")
 parser.add_argument('--host', default="127.0.0.1")
 args = parser.parse_args()
 
-run(port=args.port, host=args.host)
+print ("Starting the server")
+app.run(port=args.port, host=args.host)
+print ("Shutting down")
