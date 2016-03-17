@@ -1,8 +1,12 @@
 from bottle import Bottle
 import argparse
+from os import environ
 
 print ("Initializing")
 app = Bottle()
+print ("Reading db user data from environment")
+db_username = environ["db_username"]
+db_password = environ["db_password"]
 
 @app.get('/happiness-data')
 def list():
