@@ -3,6 +3,7 @@ import argparse
 from bottle.ext.mongo import MongoPlugin
 from bson.json_util import dumps
 from os import environ
+import time
 
 print ("Initializing")
 app = Bottle()
@@ -24,6 +25,8 @@ def save_new(mongodb):
         print ("No JSON posted")
         return {"message": "this endpoint expects JSON, try again!"}
 
+    print ("Adding timestamp to data")
+    data_point['timestamp'] = time.time()
     print ("JSON received:")
     print (dumps(data_point))
     print ("Saving to mongodb")
