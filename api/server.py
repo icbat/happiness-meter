@@ -6,11 +6,10 @@ from os import environ
 
 print ("Initializing")
 app = Bottle()
-print ("Reading db user data from environment")
-db_username = environ["db_username"]
-db_password = environ["db_password"]
+print ("Reading db configuration from 'mongo_uri' environment variable")
+mongo_uri = environ["mongo_uri"]
 print ("Connecting to mongo")
-plugin = MongoPlugin(uri="mongodb://"+ db_username +":" + db_password + "@ds015869.mlab.com:15869/heroku_c6rtcbr3", db="mydb", json_mongo=True)
+plugin = MongoPlugin(uri=mongo_uri, db="mydb", json_mongo=True)
 app.install(plugin)
 
 @app.get('/happiness-data')
