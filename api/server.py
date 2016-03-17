@@ -5,6 +5,10 @@ import argparse
 def list():
     return {'message': 'not-yet-implemented'}
 
+@get('/users')
+def list():
+    return {'message': 'not-yet-implemented'}
+
 @post('/happiness-data')
 def save_new():
     print ("### Start transmission ###")
