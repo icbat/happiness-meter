@@ -1,4 +1,4 @@
-from bottle import Bottle, request
+from bottle import Bottle, request, static_file
 import argparse
 from bottle.ext.mongo import MongoPlugin
 from bson.json_util import dumps
@@ -12,6 +12,31 @@ mongo_uri = environ["mongo_uri"]
 print ("Connecting to mongo")
 plugin = MongoPlugin(uri=mongo_uri, db="mydb", json_mongo=True)
 app.install(plugin)
+
+@app.get('/')
+@app.get('/index.html')
+def index():
+    raise static_file('index.html', root = 'mot/build/app')
+
+@app.get('/css/:path#.+#')
+def server_static(path):
+    print ('loading static css: ' + path)
+    return static_file(path, root = 'mot/build/app/css')
+
+@app.get('/js/:path#.+#')
+def server_static(path):
+    print ('loading static js: ' + path)
+    return static_file(path, root = 'mot/build/app/js')
+
+@app.get('/vendor/:path#.+#')
+def server_static(path):
+    print ('loading vendor library: ' + path)
+    return static_file(path, root = 'mot/build/app/vendor')
+
+@app.get('/home/:path#.+#')
+def server_static(path):
+    print ('loading home module file: ' + path)
+    return static_file(path, root = 'mot/build/app/home')
 
 @app.get('/happiness-data')
 def list(mongodb):
