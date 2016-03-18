@@ -16,7 +16,8 @@ app.install(plugin)
 @app.get('/')
 @app.get('/index.html')
 def index():
-    raise static_file('index.html', root = 'mot/build/app')
+    print ('loading index: index.html')
+    raise static_file('index.html', root = 'build/app')
 
 @app.get('/css/:path#.+#')
 def server_static(path):
