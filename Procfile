@@ -1,1 +1,1 @@
-web: npm install && npm install -g bower && bower install && npm install -g gulp && gulp build && python api/server.py --port $PORT --host 0.0.0.0
+web: npm install -g bower && npm install gulp && npm install && bower install && gulp build && python api/server.py --port $PORT --host 0.0.0.0
