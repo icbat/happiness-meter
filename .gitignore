@@ -23,7 +23,7 @@ ehthumbs.db
 node_modules
 report
 coverage
-build
+## build Letting this through so I don't have to run Gulp on Heroku
 tmp
 
 # Log files
