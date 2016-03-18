@@ -24,7 +24,24 @@ def server_static(path):
 def list_data(mongodb):
     print ("Fetching all happiness data from DB")
     raw = mongodb['happiness'].find()
+
     data = dumps(raw)
+    for doucment in raw:
+        print (doucment['timestamp'])
+
+    # IN
+    # {
+    # timestamp
+    # tagId
+    # emotion
+    # }
+
+    # Goal
+    #{
+    # label: tagId
+    # data[emotion1, emotion2, emotion3]
+    #}
+
     return template('graph', data=data)
 
 @app.post('/happiness-data')
