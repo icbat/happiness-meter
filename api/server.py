@@ -1,4 +1,4 @@
-from bottle import Bottle, request, static_file
+from bottle import Bottle, request, static_file, template
 import argparse
 from bottle.ext.mongo import MongoPlugin
 from bson.json_util import dumps
@@ -13,36 +13,19 @@ print ("Connecting to mongo")
 plugin = MongoPlugin(uri=mongo_uri, db="mydb", json_mongo=True)
 app.install(plugin)
 
-@app.get('/')
-@app.get('/index.html')
-def index():
-    print ('loading index: index.html')
-    raise static_file('index.html', root = 'build/app')
-
-@app.get('/css/:path#.+#')
-def server_static(path):
-    print ('loading static css: ' + path)
-    return static_file(path, root = 'build/app/css')
-
 @app.get('/js/:path#.+#')
 def server_static(path):
     print ('loading static js: ' + path)
-    return static_file(path, root = 'build/app/js')
+    return static_file(path, root = 'bower_components')
 
-@app.get('/vendor/:path#.+#')
-def server_static(path):
-    print ('loading vendor library: ' + path)
-    return static_file(path, root = 'build/app/vendor')
-
-@app.get('/home/:path#.+#')
-def server_static(path):
-    print ('loading home module file: ' + path)
-    return static_file(path, root = 'build/app/home')
-
+@app.get('/')
+@app.get('/index.html')
 @app.get('/happiness-data')
-def list(mongodb):
+def list_data(mongodb):
     print ("Fetching all happiness data from DB")
-    return dumps(mongodb['happiness'].find())
+    raw = mongodb['happiness'].find()
+    data = dumps(raw)
+    return template('graph', data=data)
 
 @app.post('/happiness-data')
 def save_new(mongodb):
@@ -63,7 +46,7 @@ def save_new(mongodb):
     return dumps(data_point)
 
 @app.get('/users')
-def list():
+def list_users():
     return {'message': 'not-yet-implemented'}
 
 @app.post('/users/link')

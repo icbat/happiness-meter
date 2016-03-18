@@ -1,1 +1,0 @@
-{"version":3,"names":[],"mappings":"","sources":["app-module.js"],"sourcesContent":["(function () {\r\n  'use strict';\r\n\r\n  /* @ngdoc object\r\n   * @name mot\r\n   * @description\r\n   *\r\n   */\r\n  angular\r\n    .module('mot', [\r\n      'ui.router',\r\n      'mgcrea.ngStrap',\r\n      'home'\r\n    ]);\r\n}());\r\n"],"file":"app-module.js","sourceRoot":"/source/"}
