@@ -21,22 +21,22 @@ def index():
 @app.get('/css/:path#.+#')
 def server_static(path):
     print ('loading static css: ' + path)
-    return static_file(path, root = 'mot/build/app/css')
+    return static_file(path, root = 'build/app/css')
 
 @app.get('/js/:path#.+#')
 def server_static(path):
     print ('loading static js: ' + path)
-    return static_file(path, root = 'mot/build/app/js')
+    return static_file(path, root = 'build/app/js')
 
 @app.get('/vendor/:path#.+#')
 def server_static(path):
     print ('loading vendor library: ' + path)
-    return static_file(path, root = 'mot/build/app/vendor')
+    return static_file(path, root = 'build/app/vendor')
 
 @app.get('/home/:path#.+#')
 def server_static(path):
     print ('loading home module file: ' + path)
-    return static_file(path, root = 'mot/build/app/home')
+    return static_file(path, root = 'build/app/home')
 
 @app.get('/happiness-data')
 def list(mongodb):
