@@ -1,6 +1,10 @@
 <script src="js/Chart.js/Chart.js"></script>
 
-<canvas id="canvas" height="450" width="600"></canvas>
+<div style="width:30%">
+	<div>
+		<canvas id="canvas" height="450" width="600"></canvas>
+	</div>
+</div>
 
 
 <script>
