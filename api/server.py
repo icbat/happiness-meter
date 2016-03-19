@@ -13,6 +13,11 @@ print ("Connecting to mongo")
 plugin = MongoPlugin(uri=mongo_uri, db="mydb", json_mongo=True)
 app.install(plugin)
 
+@app.get("/css/:path#.+#")
+def server_static(path):
+    print ("loading static css: " + path)
+    return static_file(path, root = "bower_components")
+
 @app.get("/js/:path#.+#")
 def server_static(path):
     print ("loading static js: " + path)

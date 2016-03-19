@@ -1,6 +1,7 @@
 <script src="js/Chart.js/Chart.js"></script>
 <script src="js/jquery/dist/jquery.js"></script>
 <link href='https://fonts.googleapis.com/css?family=Varela+Round' rel='stylesheet' type='text/css'>
+<link href='css/bootstrap/dist/css/bootstrap.css' rel='stylesheet' type='text/css'>
 
 <style>
 body {margin:0; font-family: 'Varela Round', sans-serif;}
@@ -17,10 +18,11 @@ h1 {color:#16d393;}
 <div class="navbar">
 	<img src="../images/mot.svg" class="logo">
 </div>
-<div class="container" id="chart-container">
+<div class="container" >
 	<h1>Your Team's Feels</h1>
-	<div>
-		<canvas id="canvas" height="450" width="600"></canvas>
+	<div id="chart-container" class="container">
+		
+            
 	</div>
 </div>
 
@@ -30,7 +32,7 @@ h1 {color:#16d393;}
 				$.each(data, function(index, dataset) {
 					var id = dataset.label;
 					console.log(dataset);
-					$('#chart-container').append('<canvas id="' + id + '" height="450" width="600"></canvas><h2>'+id	+'</h2>');
+					$('#chart-container').append('<div class="col-md-6"><canvas  id="' + id + '" height="450" width="600"></canvas><h2>'+id	+'</h2></div>');
 					new Chart(document.getElementById(id).getContext("2d")).Doughnut(dataset.data);
 				});
 		});
