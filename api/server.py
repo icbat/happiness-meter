@@ -56,19 +56,52 @@ def list_data(mongodb):
     # Step in the middle:
     # {identifier : data[emotion1, emotion2, emotion3]}
 
+    # ecstatic happy meh sad angry
+    label = "label"
+    color = "color"
+    value = "value"
+
     datasets = []
     for user in data_by_user:
         dataset = {}
+        emotions = {
+            1 : {
+                label : "Angry",
+                color: "#f00",
+                value: 0
+            },
+
+            2 : {
+                label : "Sad",
+                color: "#00F",
+                value: 0
+            },
+
+            3 : {
+                label : "Meh",
+                color: "#444",
+                value: 0
+            },
+
+            4 : {
+                label : "Happy",
+                color: "#0F0",
+                value: 0
+            },
+
+            5 : {
+                label : "Ecstatic",
+                color: "#FF0",
+                value: 0
+            }
+        }
 
         dataset["label"] = user
-        dataset["data"] = data_by_user[user]
-        dataset["fillColor"] = "rgba(151,187,205,0.2)"
-        dataset["strokeColor"] = "rgba(151,187,205,1)"
-        dataset["pointColor"] = "rgba(151,187,205,1)"
-        dataset["pointStrokeColor"] = "#fff"
-        dataset["pointHighlightFill"] = "#fff"
-        dataset["pointHighlightStroke"] = "rgba(151,187,205,1)"
+        # data_by_user[user]
+        for point in data_by_user[user]:
+            emotions[point][value] = emotions[point][value] + 1
 
+        dataset["data"] = emotions
         datasets.append(dataset)
 
 # GOAL
