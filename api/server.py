@@ -28,6 +28,14 @@ def list_data(mongodb):
     print ("Fetching all happiness data from DB")
     raw = mongodb["happiness"].find()
 
+    fake_user_map = {
+        "4572bda7c4980" : "SuperWes",
+        "45e8e6a8e4b80" : "Evan",
+        "49011c2952f80" : "James M.",
+        "453dd1bb91b80" : "Mitch",
+        "4b9b06a7c4880" : "Tice"
+    }
+
     # This essentially casts from "json" to string back to json. /shrugface
     data = dumps(raw)
     parsed = loads(data)
@@ -45,6 +53,8 @@ def list_data(mongodb):
         identifier = None
         if "tagId" in document:
             identifier = str(document["tagId"])
+            if identifier in fake_user_map:
+                identifier = fake_user_map[identifier]
         if "username" in document:
             identifier = str(document["username"])
 
