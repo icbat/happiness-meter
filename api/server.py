@@ -82,31 +82,31 @@ def list_data(mongodb):
         emotions = {
             1 : {
                 label : "Angry",
-                color: "#f00",
+                color: "#ed1c24",
                 value: 0
             },
 
             2 : {
                 label : "Sad",
-                color: "#00F",
+                color: "#1c5ab2",
                 value: 0
             },
 
             3 : {
                 label : "Meh",
-                color: "#444",
+                color: "#6F84A7",
                 value: 0
             },
 
             4 : {
                 label : "Happy",
-                color: "#0F0",
+                color: "#3bf276",
                 value: 0
             },
 
             5 : {
                 label : "Ecstatic",
-                color: "#FF0",
+                color: "#FEDF09",
                 value: 0
             }
         }
