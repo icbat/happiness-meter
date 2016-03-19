@@ -61,12 +61,12 @@ def list_data(mongodb):
 
     for document in parsed:
         identifier = None
+        if "username" in document:
+            identifier = str(document["username"])
         if "tagId" in document:
             identifier = str(document["tagId"])
             if identifier in fake_user_map:
                 identifier = fake_user_map[identifier]
-        if "username" in document:
-            identifier = str(document["username"])
 
         if identifier is not None:
             if identifier not in data_by_user:
