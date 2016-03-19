@@ -1,7 +1,7 @@
 from bottle import Bottle, request, static_file, template
 import argparse
 from bottle.ext.mongo import MongoPlugin
-from bson.json_util import dumps
+from bson.json_util import dumps, loads
 from os import environ
 import time
 
@@ -25,14 +25,24 @@ def list_data(mongodb):
     print ("Fetching all happiness data from DB")
     raw = mongodb['happiness'].find()
 
+    # This essentially casts from 'json' to string back to json. ¯\_(ツ)_/¯
     data = dumps(raw)
-    for doucment in raw:
-        print (doucment['timestamp'])
+    parsed = loads(data)
+
+    data_by_user = {}
+
+    for document in parsed:
+        print ("timestamp -- " + str(document['timestamp']))
+        print ("emotion -- " + str(document['emotion']))
+        if 'tagId' in document:
+            print ("tag -- " + str(document['tagId']))
+        if 'username' in document:
+            print ("username -- " + str(document['username']))
 
     # IN
     # {
     # timestamp
-    # tagId
+    # tagId or username
     # emotion
     # }
 
@@ -42,7 +52,7 @@ def list_data(mongodb):
     # data[emotion1, emotion2, emotion3]
     #}
 
-    return template('graph', data=data)
+    return template('graph', data=data_by_user)
 
 @app.post('/happiness-data')
 def save_new(mongodb):
