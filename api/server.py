@@ -1,7 +1,7 @@
-from bottle import Bottle, request, static_file, template
+from bottle import Bottle, request, static_file, template, debug
 import argparse
 from bottle.ext.mongo import MongoPlugin
-from bson.json_util import dumps
+from bson.json_util import dumps, loads
 from os import environ
 import time
 
@@ -13,38 +13,80 @@ print ("Connecting to mongo")
 plugin = MongoPlugin(uri=mongo_uri, db="mydb", json_mongo=True)
 app.install(plugin)
 
-@app.get('/js/:path#.+#')
+@app.get("/js/:path#.+#")
 def server_static(path):
-    print ('loading static js: ' + path)
-    return static_file(path, root = 'bower_components')
+    print ("loading static js: " + path)
+    return static_file(path, root = "bower_components")
 
-@app.get('/')
-@app.get('/index.html')
-@app.get('/happiness-data')
+@app.get("/")
+@app.get("/index.html")
+def index():
+    return template('graph')
+
+@app.get("/happiness-data")
 def list_data(mongodb):
     print ("Fetching all happiness data from DB")
-    raw = mongodb['happiness'].find()
+    raw = mongodb["happiness"].find()
 
+    # This essentially casts from "json" to string back to json. /shrugface
     data = dumps(raw)
-    for doucment in raw:
-        print (doucment['timestamp'])
+    parsed = loads(data)
 
     # IN
     # {
     # timestamp
-    # tagId
+    # tagId or username
     # emotion
     # }
 
-    # Goal
-    #{
-    # label: tagId
-    # data[emotion1, emotion2, emotion3]
-    #}
+    data_by_user = {}
 
-    return template('graph', data=data)
+    for document in parsed:
+        identifier = None
+        if "tagId" in document:
+            identifier = str(document["tagId"])
+        if "username" in document:
+            identifier = str(document["username"])
 
-@app.post('/happiness-data')
+        if identifier is not None:
+            print ("Found identifier of " + identifier)
+            if identifier not in data_by_user:
+                data_by_user[identifier] = []
+            data_by_user[identifier].append(int(document["emotion"]))
+
+    # Step in the middle:
+    # {identifier : data[emotion1, emotion2, emotion3]}
+
+    datasets = []
+    for user in data_by_user:
+        dataset = {}
+
+        dataset["label"] = user
+        dataset["data"] = data_by_user[user]
+        dataset["fillColor"] = "rgba(151,187,205,0.2)"
+        dataset["strokeColor"] = "rgba(151,187,205,1)"
+        dataset["pointColor"] = "rgba(151,187,205,1)"
+        dataset["pointStrokeColor"] = "#fff"
+        dataset["pointHighlightFill"] = "#fff"
+        dataset["pointHighlightStroke"] = "rgba(151,187,205,1)"
+
+        datasets.append(dataset)
+
+# GOAL
+# 	{
+# // 		fillColor : "rgba(151,187,205,0.2)",
+# // 		strokeColor : "rgba(151,187,205,1)",
+# // 		pointColor : "rgba(151,187,205,1)",
+# // 		pointStrokeColor : "#fff",
+# // 		pointHighlightFill : "#fff",
+# // 		pointHighlightStroke : "rgba(151,187,205,1)",
+# // 		label: "My Second dataset",
+# // 		data : [randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor()]
+# // 	}
+
+    return dumps(datasets)
+
+@app.post("/happiness-data")
 def save_new(mongodb):
     try:
         data_point = request.json
@@ -55,26 +97,28 @@ def save_new(mongodb):
         return {"message": "this endpoint expects JSON"}
 
     print ("Adding timestamp to data")
-    data_point['timestamp'] = time.time()
+    data_point["timestamp"] = time.time()
     print ("JSON received:")
     print (dumps(data_point))
     print ("Saving to mongodb")
-    mongodb['happiness'].insert(data_point)
+    mongodb["happiness"].insert(data_point)
     return dumps(data_point)
 
-@app.get('/users')
+@app.get("/users")
 def list_users():
-    return {'message': 'not-yet-implemented'}
+    return {"message": "not-yet-implemented"}
 
-@app.post('/users/link')
+@app.post("/users/link")
 def link_users():
-    return {'message': 'not-yet-implemented, use /happiness-data for testing'}
+    return {"message": "not-yet-implemented, use /happiness-data for testing"}
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--port', type=int, default="5000")
-parser.add_argument('--host', default="127.0.0.1")
+parser.add_argument("--port", type=int, default="5000")
+parser.add_argument("--host", default="127.0.0.1")
 args = parser.parse_args()
+
+debug(True)
 
 print ("Starting the server")
 app.run(port=args.port, host=args.host)
