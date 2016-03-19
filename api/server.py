@@ -49,7 +49,6 @@ def list_data(mongodb):
             identifier = str(document["username"])
 
         if identifier is not None:
-            print ("Found identifier of " + identifier)
             if identifier not in data_by_user:
                 data_by_user[identifier] = []
             data_by_user[identifier].append(int(document["emotion"]))
