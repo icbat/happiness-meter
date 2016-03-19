@@ -18,6 +18,11 @@ def server_static(path):
     print ("loading static js: " + path)
     return static_file(path, root = "bower_components")
 
+@app.get("/images/:path#.+#")
+def server_static(path):
+    print ("loading static image: " + path)
+    return static_file(path, root = "images")
+
 @app.get("/")
 @app.get("/index.html")
 def index():
