@@ -29,22 +29,36 @@ def list_data(mongodb):
     data = dumps(raw)
     parsed = loads(data)
 
-    data_by_user = {}
-
-    for document in parsed:
-        print ("timestamp -- " + str(document['timestamp']))
-        print ("emotion -- " + str(document['emotion']))
-        if 'tagId' in document:
-            print ("tag -- " + str(document['tagId']))
-        if 'username' in document:
-            print ("username -- " + str(document['username']))
-
     # IN
     # {
     # timestamp
     # tagId or username
     # emotion
     # }
+
+    data_by_user = {}
+
+    for document in parsed:
+        # print ("timestamp -- " + str(document['timestamp']))
+        # print ("emotion -- " + str(document['emotion']))
+        identifier = None
+        if 'tagId' in document:
+            # print ("tag -- " + str(document['tagId']))
+            identifier = str(document['tagId'])
+        if 'username' in document:
+            # print ("username -- " + str(document['username']))
+            identifier = str(document['username'])
+
+        if identifier is not None:
+            print ("Found identifier of " + identifier)
+            if identifier not in data_by_user:
+                data_by_user[identifier] = []
+            data_by_user[identifier].append(int(document['emotion']))
+
+    # Step in the middle:
+    # {identifier : data[emotion1, emotion2, emotion3]}
+
+
 
     # Goal
     #{
