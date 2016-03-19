@@ -11,7 +11,7 @@
 				$.each(data, function(index, dataset) {
 					var id = dataset.label;
 					console.log(dataset);
-					$('#chart-container').append('<canvas id="' + id + '" height="450" width="600"></canvas>');
+					$('#chart-container').append('<canvas id="' + id + '" height="450" width="600"></canvas><h2>'+id+'</h2>');
 					new Chart(document.getElementById(id).getContext("2d")).Doughnut(dataset.data);
 				});
 		});
