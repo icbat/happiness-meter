@@ -28,7 +28,7 @@ def list_data(mongodb):
     print ("Fetching all happiness data from DB")
     raw = mongodb["happiness"].find()
 
-    # This essentially casts from "json" to string back to json. ¯\_(ツ)_/¯
+    # This essentially casts from "json" to string back to json. /shrugface
     data = dumps(raw)
     parsed = loads(data)
 
