@@ -38,101 +38,93 @@ def index():
 
 @app.get("/happiness-data")
 def list_data(mongodb, user_map = fake_user_map):
-    print ("Fetching all happiness data from DB")
-    raw = mongodb["happiness"].find()
-
-    # This essentially casts from "json" to string back to json. /shrugface
-    data = dumps(raw)
-    parsed = loads(data)
-
-    # IN
-    # {
-    # timestamp
-    # tagId or username
-    # emotion
-    # }
-
-    data_by_user = {}
-    print ("Found " + str(len(parsed)) + " data points")
-    for document in parsed:
-        identifier = None
-        if "username" in document:
-            identifier = str(document["username"])
-        if "tagId" in document:
-            identifier = str(document["tagId"])
-            if identifier in user_map:
-                identifier = user_map[identifier]
-
-        if identifier is not None:
-            if identifier not in data_by_user:
-                data_by_user[identifier] = []
-            if "emotion" in document:
-                data_by_user[identifier].append(int(document["emotion"]))
-
-    # Step in the middle:
-    # {identifier : data[emotion1, emotion2, emotion3]}
-
-    # ecstatic happy meh sad angry
-    label = "label"
-    color = "color"
-    value = "value"
+    data_points = fetch_data(mongodb)
+    data_by_user = group_data_by_user(data_points)
+    data_by_user = map_users_togeter(data_by_user, user_map)
 
     datasets = []
     for user in data_by_user:
         dataset = {}
         emotions = {
             1 : {
-                label : "Angry",
-                color: "#ed1c24",
-                value: 0
+                "label" : "Angry",
+                "color": "#ed1c24",
+                "value": 0
             },
 
             2 : {
-                label : "Sad",
-                color: "#1c5ab2",
-                value: 0
+                "label" : "Sad",
+                "color": "#1c5ab2",
+                "value": 0
             },
 
             3 : {
-                label : "Meh",
-                color: "#6F84A7",
-                value: 0
+                "label" : "Meh",
+                "color": "#6F84A7",
+                "value": 0
             },
 
             4 : {
-                label : "Happy",
-                color: "#3bf276",
-                value: 0
+                "label" : "Happy",
+                "color": "#3bf276",
+                "value": 0
             },
 
             5 : {
-                label : "Ecstatic",
-                color: "#FEDF09",
-                value: 0
+                "label" : "Ecstatic",
+                "color": "#FEDF09",
+                "value": 0
             }
         }
 
         dataset["label"] = user
-        # data_by_user[user]
         for point in data_by_user[user]:
-            emotions[point][value] = emotions[point][value] + 1
+            emotions[point]["value"] = emotions[point]["value"] + 1
 
         dataset["data"] = emotions
         datasets.append(dataset)
 
-# GOAL
-# 	{
-# // 		fillColor : "rgba(151,187,205,0.2)",
-# // 		strokeColor : "rgba(151,187,205,1)",
-# // 		pointColor : "rgba(151,187,205,1)",
-# // 		pointStrokeColor : "#fff",
-# // 		pointHighlightFill : "#fff",
-# // 		pointHighlightStroke : "rgba(151,187,205,1)",
-# // 		label: "My Second dataset",
-# // 		data : [randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor()]
-# // 	}
-
     return dumps(datasets)
+
+def fetch_data(mongodb):
+    print ("Fetching all happiness data from DB")
+    raw = mongodb["happiness"].find()
+
+    # This essentially casts from "json" to string back to json. /shrugface
+    data = dumps(raw)
+    data_points = loads(data)
+    return data_points
+
+def group_data_by_user(data_points):
+    data_by_user = {}
+    print ("Found " + str(len(data_points)) + " data points")
+    for document in data_points:
+        identifier = None
+        if "username" in document:
+            identifier = str(document["username"])
+        if "tagId" in document:
+            identifier = str(document["tagId"])
+
+        if identifier is not None:
+            if identifier not in data_by_user:
+                data_by_user[identifier] = []
+            if "emotion" in document:
+                data_by_user[identifier].append(int(document["emotion"]))
+        else:
+            print("Could not find a username or tagId for:  " + str(document))
+    return data_by_user
+
+def map_users_togeter(data_by_user, user_map):
+    dead_users = []
+    for identifier in data_by_user:
+        if identifier in user_map:
+            mapped_username = user_map[identifier]
+            print ("Alias for " + identifier + " is " + mapped_username)
+            data_by_user[mapped_username].extend(data_by_user[identifier])
+            dead_users.append(identifier)
+    for user in dead_users:
+        del data_by_user[user]
+    return data_by_user
 
 @app.post("/happiness-data")
 def save_new(mongodb, bottleRequest = request, systemTime = time):

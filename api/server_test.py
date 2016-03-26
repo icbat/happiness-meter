@@ -65,6 +65,7 @@ def list_data_test_same_user_two_different_aliases():
     response = server.list_data(MockDB(data), {"rubble-meister" : "barney"})
     response = loads(response)
 
+    assert len(response) == 1
     assert response[0]['data']['1']['value'] == 0
     assert response[0]['data']['2']['value'] == 0
     assert response[0]['data']['3']['value'] == 2
