@@ -149,7 +149,7 @@ def save_new(mongodb, bottleRequest = request, systemTime = time):
     print ("JSON received:")
     print (dumps(data_point))
     print ("Saving to mongodb")
-    mongodb["happiness"].insert(data_point)
+    mongodb["happiness"].insert_one(data_point)
     print ("Save was successful!")
     return dumps(data_point)
 

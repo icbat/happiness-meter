@@ -53,7 +53,7 @@ class MockCollection:
     def __init__(self):
         self.last_interaction = None
 
-    def insert(self, item):
+    def insert_one(self, item):
         self.last_interaction = item
 
     def last_interaction(self):
