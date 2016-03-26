@@ -16,6 +16,33 @@ fake_user_map = {
     "4b9b06a7c4880" : "Tice"
 }
 
+known_emotions = {
+    1 : {
+        "label" : "Angry",
+        "color": "#ed1c24"
+    },
+
+    2 : {
+        "label" : "Sad",
+        "color": "#1c5ab2"
+    },
+
+    3 : {
+        "label" : "Meh",
+        "color": "#6F84A7"
+    },
+
+    4 : {
+        "label" : "Happy",
+        "color": "#3bf276"
+    },
+
+    5 : {
+        "label" : "Ecstatic",
+        "color": "#FEDF09"
+    }
+}
+
 @app.get("/css/:path#.+#")
 def server_static(path):
     print ("loading static css: " + path)
@@ -44,45 +71,8 @@ def list_data(mongodb, user_map = fake_user_map):
 
     datasets = []
     for user in data_by_user:
-        dataset = {}
-        emotions = {
-            1 : {
-                "label" : "Angry",
-                "color": "#ed1c24",
-                "value": 0
-            },
-
-            2 : {
-                "label" : "Sad",
-                "color": "#1c5ab2",
-                "value": 0
-            },
-
-            3 : {
-                "label" : "Meh",
-                "color": "#6F84A7",
-                "value": 0
-            },
-
-            4 : {
-                "label" : "Happy",
-                "color": "#3bf276",
-                "value": 0
-            },
-
-            5 : {
-                "label" : "Ecstatic",
-                "color": "#FEDF09",
-                "value": 0
-            }
-        }
-
-        dataset["label"] = user
-        for point in data_by_user[user]:
-            emotions[point]["value"] = emotions[point]["value"] + 1
-
-        dataset["data"] = emotions
-        datasets.append(dataset)
+        emotions = count_data(data_by_user[user])
+        datasets.append(build_dataset_for_graphjs(user, emotions))
 
     return dumps(datasets)
 
@@ -111,7 +101,7 @@ def group_data_by_user(data_points):
             if "emotion" in document:
                 data_by_user[identifier].append(int(document["emotion"]))
         else:
-            print("Could not find a username or tagId for:  " + str(document))
+            print("Could not find a username or tagId for entry:  " + str(document))
     return data_by_user
 
 def map_users_togeter(data_by_user, user_map):
@@ -125,6 +115,25 @@ def map_users_togeter(data_by_user, user_map):
     for user in dead_users:
         del data_by_user[user]
     return data_by_user
+
+def count_data(dataset):
+    output = {}
+    for entry in dataset:
+        if entry not in output:
+            output[entry] = 0
+        output[entry] = output[entry] + 1
+    return output
+
+def build_dataset_for_graphjs(user, dataset):
+    if dataset:
+        data = {}
+        for emotion in dataset:
+            data[emotion] = {"value": dataset[emotion]}
+            if emotion in known_emotions:
+                data[emotion]["label"] = known_emotions[emotion]["label"]
+                data[emotion]["color"] = known_emotions[emotion]["color"]
+        return {"label": user, "data": data}
+    return {}
 
 @app.post("/happiness-data")
 def save_new(mongodb, bottleRequest = request, systemTime = time):

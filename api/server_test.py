@@ -8,32 +8,24 @@ def list_data_test_no_data():
 
 def list_data_test_one_datum():
     data = [
-        {"username" : "barney", "emotion" : "3"}
+        {"username" : "barney", "emotion" : "2"}
     ]
 
     response = server.list_data(MockDB(data))
     response = loads(response)
 
-    assert response[0]['data']['1']['value'] == 0
-    assert response[0]['data']['2']['value'] == 0
-    assert response[0]['data']['3']['value'] == 1
-    assert response[0]['data']['4']['value'] == 0
-    assert response[0]['data']['5']['value'] == 0
+    assert response[0]['data']['2']['value'] == 1
 
 def list_data_test_ignores_data_without_emotions():
     data = [
-        {"username" : "barney", "emotion" : "3"},
+        {"username" : "barney", "emotion" : "4"},
         {"username" : "barney"},
     ]
 
     response = server.list_data(MockDB(data))
     response = loads(response)
 
-    assert response[0]['data']['1']['value'] == 0
-    assert response[0]['data']['2']['value'] == 0
-    assert response[0]['data']['3']['value'] == 1
-    assert response[0]['data']['4']['value'] == 0
-    assert response[0]['data']['5']['value'] == 0
+    assert response[0]['data']['4']['value'] == 1
 
 def list_data_test_two_users():
     data = [
@@ -44,17 +36,9 @@ def list_data_test_two_users():
     response = server.list_data(MockDB(data))
     response = loads(response)
 
-    assert response[0]['data']['1']['value'] == 0
-    assert response[0]['data']['2']['value'] == 0
     assert response[0]['data']['3']['value'] == 1
-    assert response[0]['data']['4']['value'] == 0
-    assert response[0]['data']['5']['value'] == 0
 
-    assert response[1]['data']['1']['value'] == 0
-    assert response[1]['data']['2']['value'] == 0
     assert response[1]['data']['3']['value'] == 1
-    assert response[1]['data']['4']['value'] == 0
-    assert response[1]['data']['5']['value'] == 0
 
 def list_data_test_same_user_two_different_aliases():
     data = [
@@ -66,11 +50,7 @@ def list_data_test_same_user_two_different_aliases():
     response = loads(response)
 
     assert len(response) == 1
-    assert response[0]['data']['1']['value'] == 0
-    assert response[0]['data']['2']['value'] == 0
     assert response[0]['data']['3']['value'] == 2
-    assert response[0]['data']['4']['value'] == 0
-    assert response[0]['data']['5']['value'] == 0
 
 def save_new_test_saves_sent_object():
     db = MockDB()
@@ -104,6 +84,41 @@ def save_new_test_fails_gracefully_with_malformed_json():
     response = server.save_new(db, request)
 
     assert response["message"] == "malformed JSON was provided"
+
+def count_data_test_empty():
+    result = server.count_data([])
+
+    assert result == {}
+
+def count_data_test_one_point():
+    result = server.count_data([1])
+
+    assert result == {1: 1}
+
+def count_data_test_multiple_instances_of_a_point():
+    result = server.count_data([1, 1])
+
+    assert result == {1: 2}
+
+def count_data_test_multiple_instances_of_a_point():
+    result = server.count_data([1, 2])
+
+    assert result == {1: 1, 2: 1}
+
+def build_dataset_for_graphjs_test_no_data():
+    result = server.build_dataset_for_graphjs("bambam", {})
+
+    assert result == {}
+
+def build_dataset_for_graphjs_test_one_point_not_in_known_emotion_map():
+    result = server.build_dataset_for_graphjs("bambam", {9999: 3})
+
+    assert result == {"label": "bambam", "data": {9999: {"value": 3}}}
+
+def build_dataset_for_graphjs_test_one_point_with_known_emotion():
+    result = server.build_dataset_for_graphjs("bambam", {2: 3})
+
+    assert result == {"label": "bambam", "data": {2: {"value": 3, "label": "Sad", "color": "#1c5ab2"}}}
 
 class MockRequest:
         json = ""
