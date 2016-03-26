@@ -4,9 +4,14 @@
 Include/
 Lib/
 Scripts
+man/
 
 # Pip's caching mechanism
 pip-selfcheck.json
+
+__pycache__
+
+nosetests.json
 
 # Mac
 .DS_Store

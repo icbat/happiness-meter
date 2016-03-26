@@ -134,9 +134,10 @@ def list_data(mongodb):
     return dumps(datasets)
 
 @app.post("/happiness-data")
-def save_new(mongodb):
+def save_new(mongodb, bottleRequest = request, systemTime = time):
     try:
-        data_point = request.json
+        data_point = bottleRequest.json
+        print ("Saving new from " + str(data_point))
     except:
         return {"message": "malformed JSON was provided"}
     if data_point is None:
@@ -144,11 +145,12 @@ def save_new(mongodb):
         return {"message": "this endpoint expects JSON"}
 
     print ("Adding timestamp to data")
-    data_point["timestamp"] = time.time()
+    data_point["timestamp"] = systemTime.time()
     print ("JSON received:")
     print (dumps(data_point))
     print ("Saving to mongodb")
     mongodb["happiness"].insert(data_point)
+    print ("Save was successful!")
     return dumps(data_point)
 
 @app.get("/users")
