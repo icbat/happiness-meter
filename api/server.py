@@ -7,11 +7,6 @@ import time
 
 print ("Initializing")
 app = Bottle()
-print ("Reading db configuration from 'mongo_uri' environment variable")
-mongo_uri = environ["mongo_uri"]
-print ("Connecting to mongo")
-plugin = MongoPlugin(uri=mongo_uri, db="mydb", json_mongo=True)
-app.install(plugin)
 
 @app.get("/css/:path#.+#")
 def server_static(path):
@@ -164,14 +159,20 @@ def list_users():
 def link_users():
     return {"message": "not-yet-implemented, use /happiness-data for testing"}
 
+if __name__ == "__main__":
+    print ("Reading db configuration from 'mongo_uri' environment variable")
+    mongo_uri = environ["mongo_uri"]
+    print ("Connecting to mongo")
+    plugin = MongoPlugin(uri=mongo_uri, db="mydb", json_mongo=True)
+    app.install(plugin)
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--port", type=int, default="5000")
-parser.add_argument("--host", default="127.0.0.1")
-args = parser.parse_args()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--port", type=int, default="5000")
+    parser.add_argument("--host", default="127.0.0.1")
+    args = parser.parse_args()
 
-debug(True)
+    debug(True)
 
-print ("Starting the server")
-app.run(port=args.port, host=args.host)
-print ("Shutting down")
+    print ("Starting the server")
+    app.run(port=args.port, host=args.host)
+    print ("Shutting down")
