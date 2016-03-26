@@ -8,6 +8,14 @@ import time
 print ("Initializing")
 app = Bottle()
 
+fake_user_map = {
+    "4572bda7c4980" : "SuperWes",
+    "45e8e6a8e4b80" : "Evan",
+    "49011c2952f80" : "James M.",
+    "453dd1bb91b80" : "Mitch",
+    "4b9b06a7c4880" : "Tice"
+}
+
 @app.get("/css/:path#.+#")
 def server_static(path):
     print ("loading static css: " + path)
@@ -29,17 +37,9 @@ def index():
     return template('graph')
 
 @app.get("/happiness-data")
-def list_data(mongodb):
+def list_data(mongodb, user_map = fake_user_map):
     print ("Fetching all happiness data from DB")
     raw = mongodb["happiness"].find()
-
-    fake_user_map = {
-        "4572bda7c4980" : "SuperWes",
-        "45e8e6a8e4b80" : "Evan",
-        "49011c2952f80" : "James M.",
-        "453dd1bb91b80" : "Mitch",
-        "4b9b06a7c4880" : "Tice"
-    }
 
     # This essentially casts from "json" to string back to json. /shrugface
     data = dumps(raw)
@@ -53,20 +53,21 @@ def list_data(mongodb):
     # }
 
     data_by_user = {}
-
+    print ("Found " + str(len(parsed)) + " data points")
     for document in parsed:
         identifier = None
         if "username" in document:
             identifier = str(document["username"])
         if "tagId" in document:
             identifier = str(document["tagId"])
-            if identifier in fake_user_map:
-                identifier = fake_user_map[identifier]
+            if identifier in user_map:
+                identifier = user_map[identifier]
 
         if identifier is not None:
             if identifier not in data_by_user:
                 data_by_user[identifier] = []
-            data_by_user[identifier].append(int(document["emotion"]))
+            if "emotion" in document:
+                data_by_user[identifier].append(int(document["emotion"]))
 
     # Step in the middle:
     # {identifier : data[emotion1, emotion2, emotion3]}

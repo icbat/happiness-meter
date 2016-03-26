@@ -1,5 +1,75 @@
 import server
+from bson.json_util import loads
 
+def list_data_test_no_data():
+    response = server.list_data(MockDB())
+
+    assert response == "[]"
+
+def list_data_test_one_datum():
+    data = [
+        {"username" : "barney", "emotion" : "3"}
+    ]
+
+    response = server.list_data(MockDB(data))
+    response = loads(response)
+
+    assert response[0]['data']['1']['value'] == 0
+    assert response[0]['data']['2']['value'] == 0
+    assert response[0]['data']['3']['value'] == 1
+    assert response[0]['data']['4']['value'] == 0
+    assert response[0]['data']['5']['value'] == 0
+
+def list_data_test_ignores_data_without_emotions():
+    data = [
+        {"username" : "barney", "emotion" : "3"},
+        {"username" : "barney"},
+    ]
+
+    response = server.list_data(MockDB(data))
+    response = loads(response)
+
+    assert response[0]['data']['1']['value'] == 0
+    assert response[0]['data']['2']['value'] == 0
+    assert response[0]['data']['3']['value'] == 1
+    assert response[0]['data']['4']['value'] == 0
+    assert response[0]['data']['5']['value'] == 0
+
+def list_data_test_two_users():
+    data = [
+        {"username" : "barney", "emotion" : "3"},
+        {"username" : "dino", "emotion" : "3"}
+    ]
+
+    response = server.list_data(MockDB(data))
+    response = loads(response)
+
+    assert response[0]['data']['1']['value'] == 0
+    assert response[0]['data']['2']['value'] == 0
+    assert response[0]['data']['3']['value'] == 1
+    assert response[0]['data']['4']['value'] == 0
+    assert response[0]['data']['5']['value'] == 0
+
+    assert response[1]['data']['1']['value'] == 0
+    assert response[1]['data']['2']['value'] == 0
+    assert response[1]['data']['3']['value'] == 1
+    assert response[1]['data']['4']['value'] == 0
+    assert response[1]['data']['5']['value'] == 0
+
+def list_data_test_same_user_two_different_aliases():
+    data = [
+        {"username" : "barney", "emotion" : "3"},
+        {"tagId" : "rubble-meister", "emotion" : "3"}
+    ]
+
+    response = server.list_data(MockDB(data), {"rubble-meister" : "barney"})
+    response = loads(response)
+
+    assert response[0]['data']['1']['value'] == 0
+    assert response[0]['data']['2']['value'] == 0
+    assert response[0]['data']['3']['value'] == 2
+    assert response[0]['data']['4']['value'] == 0
+    assert response[0]['data']['5']['value'] == 0
 
 def save_new_test_saves_sent_object():
     db = MockDB()
@@ -43,21 +113,25 @@ class ThrowingRequest:
     pass
 
 class MockDB:
-    def __init__(self):
-        self.mockCollection = MockCollection()
+    def __init__(self, mock_data = []):
+        self.mockCollection = MockCollection(mock_data)
 
     def __getitem__(self, item):
         return self.mockCollection
 
 class MockCollection:
-    def __init__(self):
+    def __init__(self, mock_data):
         self.last_interaction = None
+        self.mock_data = mock_data
 
     def insert_one(self, item):
         self.last_interaction = item
 
     def last_interaction(self):
         return self.last_interaction
+
+    def find(self):
+        return self.mock_data
 
 class MockTime:
     def time(self):
