@@ -138,8 +138,19 @@ def build_dataset_for_graphjs(user, dataset):
         return {"label": user, "data": data}
     return {}
 
+@app.get("/users")
+def list_users():
+    return {"message": "not-yet-implemented"}
+
 @app.post("/happiness-data")
 def save_new(mongodb, bottleRequest = request, systemTime = time):
+    return save_request_to_db("happiness", mongodb, bottleRequest, systemTime)
+
+@app.post("/users/link")
+def link_users():
+    return {"message": "not-yet-implemented, use /happiness-data for testing"}
+
+def save_request_to_db(db_collection_name, mongodb, bottleRequest, systemTime):
     try:
         data_point = bottleRequest.json
         print ("Saving new from " + str(data_point))
@@ -154,17 +165,9 @@ def save_new(mongodb, bottleRequest = request, systemTime = time):
     print ("JSON received:")
     print (dumps(data_point))
     print ("Saving to mongodb")
-    mongodb["happiness"].insert_one(data_point)
+    mongodb[db_collection_name].insert_one(data_point)
     print ("Save was successful!")
     return dumps(data_point)
-
-@app.get("/users")
-def list_users():
-    return {"message": "not-yet-implemented"}
-
-@app.post("/users/link")
-def link_users():
-    return {"message": "not-yet-implemented, use /happiness-data for testing"}
 
 if __name__ == "__main__":
     print ("Reading db configuration from 'mongo_uri' environment variable")
