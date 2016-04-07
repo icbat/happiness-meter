@@ -91,6 +91,41 @@ def save_new_test_fails_gracefully_with_malformed_json():
 
     assert response["message"] == "malformed JSON was provided"
 
+def link_users_test_saves_sent_object():
+    db = MockDB()
+    request = MockRequest({"username" : "freddy"})
+
+    server.link_users(db, request, MockTime())
+
+    saved = db["happiness"].last_interaction
+    assert saved["username"] == "freddy"
+
+def link_users_test_adds_timestamp_before_saving():
+    db = MockDB()
+    time = MockTime()
+
+    server.link_users(db, MockRequest({}), time)
+
+    saved = db["happiness"].last_interaction
+    assert saved["timestamp"] == time.time()
+
+def link_users_test_fails_gracefully_with_no_json():
+    request = MockRequest(None)
+
+    response = server.link_users(MockDB(), request)
+
+    assert response["message"] == "this endpoint expects JSON"
+
+def link_users_test_fails_gracefully_with_malformed_json():
+    db = MockDB()
+    request = ThrowingRequest()
+
+    response = server.link_users(db, request)
+
+    assert response["message"] == "malformed JSON was provided"
+
+
+
 def count_data_test_empty():
     result = server.count_data([])
 

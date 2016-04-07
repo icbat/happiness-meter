@@ -147,8 +147,8 @@ def save_new(mongodb, bottleRequest = request, systemTime = time):
     return save_request_to_db("happiness", mongodb, bottleRequest, systemTime)
 
 @app.post("/users/link")
-def link_users():
-    return {"message": "not-yet-implemented, use /happiness-data for testing"}
+def link_users(mongodb, bottleRequest = request, systemTime = time):
+    return save_request_to_db("happiness", mongodb, bottleRequest, systemTime)
 
 def save_request_to_db(db_collection_name, mongodb, bottleRequest, systemTime):
     try:
