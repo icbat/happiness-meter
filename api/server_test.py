@@ -52,6 +52,12 @@ def list_data_test_same_user_two_different_aliases():
     assert len(response) == 1
     assert response[0]['data']['3']['value'] == 2
 
+def map_users_together_test_someone_not_in_main_list():
+
+    actual = server.map_users_together({"garbledID" : ["point"]}, {"garbledID" : "Pretty Display Name"})
+
+    assert actual["Pretty Display Name"][0] == "point"
+
 def save_new_test_saves_sent_object():
     db = MockDB()
     request = MockRequest({"username" : "freddy"})

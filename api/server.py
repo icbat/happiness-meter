@@ -67,7 +67,7 @@ def index():
 def list_data(mongodb, user_map = fake_user_map):
     data_points = fetch_data(mongodb)
     data_by_user = group_data_by_user(data_points)
-    data_by_user = map_users_togeter(data_by_user, user_map)
+    data_by_user = map_users_together(data_by_user, user_map)
 
     datasets = []
     for user in data_by_user:
@@ -104,17 +104,20 @@ def group_data_by_user(data_points):
             print("Could not find a username or tagId for entry:  " + str(document))
     return data_by_user
 
-def map_users_togeter(data_by_user, user_map):
-    dead_users = []
+def map_users_together(data_by_user, user_map):
+    mapped_data = {}
     for identifier in data_by_user:
+        mapped_username = identifier
+
         if identifier in user_map:
             mapped_username = user_map[identifier]
-            print ("Alias for " + identifier + " is " + mapped_username)
-            data_by_user[mapped_username].extend(data_by_user[identifier])
-            dead_users.append(identifier)
-    for user in dead_users:
-        del data_by_user[user]
-    return data_by_user
+
+        print ("Alias for " + identifier + " is " + mapped_username)
+        if mapped_username not in mapped_data:
+            mapped_data[mapped_username] = []
+        mapped_data[mapped_username].extend(data_by_user[identifier])
+
+    return mapped_data
 
 def count_data(dataset):
     output = {}
